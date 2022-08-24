@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="play">
+      Play
+    </button>
+
+    <script>
+    function playNote(note) {
+      return new Promise(resolve => {
+        let context = new AudioContext(),
+        oscillator = context.createOscillator(),
+        contextGain = context.createGain();
+
+        oscillator.connect(contextGain);
+        contextGain.connect(context.destination);
+        oscillator.start(0);
+
+        oscillator.frequency.value = note;
+        contextGain.gain.value = 0.6;
+        oscillator.stop(context.currentTime + 0.4);
+
+        contextGain.gain.exponentialRampToValueAtTime(
+          0.00001, context.currentTime + 6.04
+        )
+
+        resolve();
+      });
+    }
+
+    function playASong(notes, song) {
+      new Promise(async (resolve) => {
+        for (let letters of song) {
+          for (let letter of letters) {
+            const note = notes[letter];
+            playNote(note);
+            // aguarda meio segundo pra tocar a proxima nota
+            await (async () => await new Promise(resolve => setTimeout(resolve, 500)))();
+          }
+        }
+      });
+    }
+
+    const notes = {
+      'DO': 261.6, // C4 - 18
+      'RE': 293.7, // D4 - 23
+      'MI': 329.6, // E4 - 10
+      'FA': 349.2, // F4 - 11
+      'SOL': 392.0, // G4 - 13
+      'LA': 440.0, // A4 - 11
+      'SI': 493.9, // B4 - 17
+    };
+    const letters = Object.keys(notes);
+
+    const atireiOPauNoGato = [
+      ['SOL', 'FA', 'MI', 'RE', 'MI', 'FA', 'SOL', 'SOL', 'SOL'],
+      ['LA', 'SOL', 'FA', 'FA', 'FA'],
+      ['SOL', 'FA', 'MI', 'MI', 'MI'],
+      ['DO', 'DO', 'LA', 'LA', 'LA'],
+      ['SI', 'LA', 'SOL', 'SOL', 'SOL'],
+      ['MI', 'FA', 'SOL', 'MI', 'FA', 'SOL'],
+      ['FA', 'MI', 'RE', 'DO'],
+      ['DO', 'DO']
+    ];
+
+    document.querySelector('#play').addEventListener('click', () => {
+      playASong(notes, atireiOPauNoGato);
+    });
+    </script>
+  </body>
+</html>
