@@ -12,9 +12,11 @@
     </button>
 
     <script>
+    var audioContext = window.AudioContext || window.webkitAudioContext();
+    if (!audioContext) return console.log("your browser doesn't support")
     function playNote(note) {
       return new Promise(resolve => {
-        let context = new AudioContext(),
+        let context = new audioContext(),
         oscillator = context.createOscillator(),
         contextGain = context.createGain();
 
